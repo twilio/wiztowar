@@ -6,6 +6,11 @@
     <artifactId>wiztowar</artifactId>
     <version>1.1-SNAPSHOT</version>
     <packaging>jar</packaging>
+
+    <name>wiztowar</name>
+    <description>WizToWar is a simple library that helps you deploy Dropwizard services as a WAR in a WAR container</description>
+    <url>http://github.com/twilio/wiztowar</url>
+
     <properties>
         <dropwizard.version>0.6.2</dropwizard.version>
         <metrics.version>2.2.0</metrics.version>
