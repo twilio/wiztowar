@@ -1,7 +1,7 @@
 WizToWar - Have your cake and eat it too
 ========================================
 
-WizToWar is a simple library that enables a Dropwizard service to also be deployable in a WAR container such as Tomcat.
+WizToWar is a simple library that enables a [Dropwizard](http://dropwizard.io) service to also be deployable in a WAR container such as Tomcat.
 
 By following the steps in the usage section below you will be able to create both a Dropwizard jar and a WAR of the same
 service.
