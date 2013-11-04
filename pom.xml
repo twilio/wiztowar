@@ -4,7 +4,7 @@
 
     <groupId>com.twilio</groupId>
     <artifactId>wiztowar</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
     <properties>
         <dropwizard.version>0.6.2</dropwizard.version>
