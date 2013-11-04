@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.twilio</groupId>
@@ -8,8 +9,25 @@
     <packaging>jar</packaging>
 
     <name>wiztowar</name>
-    <description>WizToWar is a simple library that helps you deploy Dropwizard services as a WAR in a WAR container</description>
+    <description>WizToWar is a simple library that helps you deploy Dropwizard services as a WAR in a WAR container
+    </description>
     <url>http://github.com/twilio/wiztowar</url>
+
+
+    <developers>
+        <developer>
+            <id>christer</id>
+            <name>Christer Fahlgren</name>
+            <email>christer@twilio.com</email>
+        </developer>
+    </developers>
+    <licenses>
+        <license>
+            <name>The MIT License</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <properties>
         <dropwizard.version>0.6.2</dropwizard.version>
