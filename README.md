@@ -51,7 +51,7 @@ Create a new class for your application like this:
     		
 		/**
 		* Return the File where the configuration lives.
-                */
+		*/
 		@Override
 		public File getConfigurationFile() {
 
@@ -70,37 +70,23 @@ Create a main/webapp/WEB-INF/web.xml file:
 
 	<?xml version="1.0" encoding="UTF-8"?>
 	<web-app>
-
+		<!--- This listener is required to hook in to the lifecycle of the WAR -->
 		<listener>
 			<listener-class>com.twilio.wiztowar.ServletContextCallback</listener-class>
 		</listener>
 		<servlet>
 			<servlet-name>Jersey REST Service</servlet-name>
 			<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+
 			<!--- Replace this with your DWAdapter derived application -->
 			<init-param>
 				<param-name>javax.ws.rs.Application</param-name>
 				<param-value>com.twilio.mixerstate.MixerStateDWApplication</param-value>
 			</init-param>
-			<!--- Replace this with your DWAdapter derived application -->
-			<init-param>
-				<param-name>com.sun.jersey.config.property.packages</param-name>
-				<param-value>com.twilio.mixerstate.resources</param-value>
-			</init-param>
 			<init-param>
 				<param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
 				<param-value>true</param-value>
 			</init-param>
-			<!-- Only required for logging requests
-			<init-param>
-				<param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
-				<param-value>com.sun.jersey.api.container.filter.LoggingFilter</param-value>
-			</init-param>
-			<init-param>
-				<param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
-				<param-value>com.sun.jersey.api.container.filter.LoggingFilter</param-value>
-			</init-param>
-			-->
 			<load-on-startup>1</load-on-startup>
 		</servlet>
 
