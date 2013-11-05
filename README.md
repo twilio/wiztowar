@@ -21,11 +21,11 @@ Usage
 Include the wiztowar jar as a dependency:
 
 ```xml
-	<dependency>
-		<groupId>com.twilio</groupId>
-		<artifactId>wiztowar</artifactId>
-		<version>1.2</version>
-	</dependency>
+<dependency>
+    <groupId>com.twilio</groupId>
+    <artifactId>wiztowar</artifactId>
+    <version>1.2</version>
+</dependency>
 ```
 
 Create a new class for your application like this:
@@ -73,33 +73,33 @@ Create a main/webapp/WEB-INF/web.xml file:
 ------------------------------------------
 
 ```xml
-	<?xml version="1.0" encoding="UTF-8"?>
-	<web-app>
-		<!--- This listener is required to hook in to the lifecycle of the WAR -->
-		<listener>
-			<listener-class>com.twilio.wiztowar.ServletContextCallback</listener-class>
-		</listener>
-		<servlet>
-			<servlet-name>Jersey REST Service</servlet-name>
-			<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app>
+    <!--- This listener is required to hook in to the lifecycle of the WAR -->
+    <listener>
+        <listener-class>com.twilio.wiztowar.ServletContextCallback</listener-class>
+    </listener>
+    <servlet>
+        <servlet-name>Jersey REST Service</servlet-name>
+        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
 
-			<!--- Replace this with your DWAdapter derived application -->
-			<init-param>
-				<param-name>javax.ws.rs.Application</param-name>
-				<param-value>com.twilio.mixerstate.MixerStateDWApplication</param-value>
-			</init-param>
-			<init-param>
-				<param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
-				<param-value>true</param-value>
-			</init-param>
-			<load-on-startup>1</load-on-startup>
-		</servlet>
+        <!--- Replace this with your DWAdapter derived application -->
+        <init-param>
+            <param-name>javax.ws.rs.Application</param-name>
+            <param-value>com.twilio.mixerstate.MixerStateDWApplication</param-value>
+        </init-param>
+        <init-param>
+            <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
 
-		<servlet-mapping>
-			<servlet-name>Jersey REST Service</servlet-name>
-			<url-pattern>/*</url-pattern>
-		</servlet-mapping>
-	</web-app>
+    <servlet-mapping>
+        <servlet-name>Jersey REST Service</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+</web-app>
 ```
 
 Make sure you also build a WAR artifact
@@ -112,23 +112,23 @@ There are two alternatives to building a war:
 This goes in `<build><plugins>` section:
 
 ```xml
-	<plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-war-plugin</artifactId>
-		<version>2.4</version>
-		<executions>
-			<execution>
-				<id>default-war</id>
-				<phase>package</phase>
-				<goals>
-					<goal>war</goal>
-				</goals>
-			</execution>
-		</executions>
-		<configuration>
-            <webappDirectory>target/webapp</webappDirectory>
-		</configuration>
-	</plugin>
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-war-plugin</artifactId>
+    <version>2.4</version>
+    <executions>
+        <execution>
+            <id>default-war</id>
+            <phase>package</phase>
+            <goals>
+                <goal>war</goal>
+            </goals>
+        </execution>
+    </executions>
+    <configuration>
+        <webappDirectory>target/webapp</webappDirectory>
+    </configuration>
+</plugin>
 ```
 
 ### b. Change packaging of your Dropwizard service
