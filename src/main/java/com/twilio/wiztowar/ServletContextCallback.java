@@ -15,8 +15,17 @@ public class ServletContextCallback implements ServletContextListener {
      */
     private static ServletContext ctxt;
 
+    /**
+     * The {@link DWAdapter}.
+     */
+    private static DWAdapter<?> dwAdapter;
+
     public static ServletContext getServletContext() {
         return ctxt;
+    }
+
+    public static void setDWAdapter(DWAdapter<?> adapter){
+        dwAdapter = adapter;
     }
 
     @Override
@@ -26,5 +35,8 @@ public class ServletContextCallback implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
+        if (dwAdapter != null) {
+            dwAdapter.shutDown();
+        }
     }
 }

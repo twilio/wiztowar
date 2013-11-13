@@ -55,6 +55,11 @@ public abstract class DWAdapter<T extends Configuration> extends Application {
     private Service dwService;
 
     /**
+     * The {@link Service} which we are adapting.
+     */
+    private ExtendedEnvironment environment;
+
+    /**
      * Implementation of the Jersey Application. Returns the classes.
      *
      * @return the Jersey configured classes
@@ -105,27 +110,31 @@ public abstract class DWAdapter<T extends Configuration> extends Application {
             }
 
             final Validator validator = new Validator();
-            final ExtendedEnvironment env = new ExtendedEnvironment(bootstrap.getName(), configuration, bootstrap.getObjectMapperFactory(), validator);
+            environment = new ExtendedEnvironment(bootstrap.getName(), configuration, bootstrap.getObjectMapperFactory(), validator);
             try {
 
-                env.start();
+                environment.start();
 
-                dwService.run(configuration, env);
-                addHealthChecks(env);
+                dwService.run(configuration, environment);
+                addHealthChecks(environment);
                 final ServletContext servletContext = ServletContextCallback.getServletContext();
                 if (servletContext == null) {
                     throw new IllegalStateException("ServletContext is null");
                 }
-                createInternalServlet(env, servletContext);
-                createExternalServlet(env, configuration.getHttpConfiguration(), servletContext);
-                env.validateJerseyResources();
-                env.logEndpoints(configuration);
+
+                //Set the static DWAdapter so that we can shutdown
+                ServletContextCallback.setDWAdapter(this);
+
+                createInternalServlet(environment, servletContext);
+                createExternalServlet(environment, configuration.getHttpConfiguration(), servletContext);
+                environment.validateJerseyResources();
+                environment.logEndpoints(configuration);
 
                 // Now collect the Jersey configuration
                 singletons = new HashSet<Object>();
-                singletons.addAll(env.getJerseyResourceConfig().getSingletons());
+                singletons.addAll(environment.getJerseyResourceConfig().getSingletons());
                 classes = new HashSet<Class<?>>();
-                classes.addAll(env.getJerseyResourceConfig().getClasses());
+                classes.addAll(environment.getJerseyResourceConfig().getClasses());
 
             } catch (Exception e) {
                 logger.error("Error {} ", e);
@@ -267,5 +276,13 @@ public abstract class DWAdapter<T extends Configuration> extends Application {
      * @return the {@link File} to read the configuration from.
      */
     public abstract File getConfigurationFile();
+
+    public void shutDown() {
+        try {
+            this.environment.stop();
+        } catch (Exception e) {
+          logger.error("Failed to stop environment cleanly due to {}", e);
+        }
+    }
 }
 

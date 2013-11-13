@@ -23,7 +23,7 @@ Include the wiztowar jar as a dependency:
 	<dependency>
 		<groupId>com.twilio</groupId>
 		<artifactId>wiztowar</artifactId>	
-		<version>1.2</version>
+		<version>1.3</version>
 	</dependency>
 
 Create a new class for your application like this:
