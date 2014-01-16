@@ -115,6 +115,8 @@ public abstract class DWAdapter<T extends Configuration> extends Application {
 
                 environment.start();
 
+                bootstrap.runWithBundles(configuration, environment); //Fix for issue https://github.com/twilio/wiztowar/issues/2
+
                 dwService.run(configuration, environment);
                 addHealthChecks(environment);
                 final ServletContext servletContext = ServletContextCallback.getServletContext();
