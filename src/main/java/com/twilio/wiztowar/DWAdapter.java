@@ -18,8 +18,10 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
+import javax.servlet.http.HttpServlet;
 import javax.ws.rs.core.Application;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -195,7 +197,7 @@ public abstract class DWAdapter<T extends Configuration> extends Application {
             // Add the Admin servlet
             final ServletRegistration.Dynamic adminServlet = context.addServlet("AdminServlet", new AdminServlet());
             adminServlet.setAsyncSupported(true);
-            adminServlet.addMapping("/*");
+            adminServlet.addMapping("/admin/*");
         } else throw new IllegalStateException("The WizToWar adapter doesn't support servlet versions under 3");
     }
 
@@ -213,7 +215,11 @@ public abstract class DWAdapter<T extends Configuration> extends Application {
         }
 
         for (ImmutableMap.Entry<String, ServletHolder> entry : env.getServlets().entrySet()) {
-            context.addServlet(entry.getKey(), entry.getValue().getServletInstance());
+            final HttpServlet servletInstance = (HttpServlet) entry.getValue().getServletInstance();
+            final ServletRegistration.Dynamic servletReg = context.addServlet(entry.getKey(), servletInstance);
+            servletReg.setAsyncSupported(true);
+            servletReg.addMapping(entry.getKey());
+            servletReg.setLoadOnStartup(1);
         }
 
         env.addProvider(new JacksonMessageBodyProvider(env.getObjectMapperFactory().build(),
