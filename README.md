@@ -77,28 +77,8 @@ Create a main/webapp/WEB-INF/web.xml file:
 <web-app>
     <!--- This listener is required to hook in to the lifecycle of the WAR -->
     <listener>
-        <listener-class>com.twilio.wiztowar.ServletContextCallback</listener-class>
+        <listener-class>com.twilio.mixerstate.MixerStateDWApplication</listener-class>
     </listener>
-    <servlet>
-        <servlet-name>Jersey REST Service</servlet-name>
-        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
-
-        <!--- Replace this with your DWAdapter derived application -->
-        <init-param>
-            <param-name>javax.ws.rs.Application</param-name>
-            <param-value>com.twilio.mixerstate.MixerStateDWApplication</param-value>
-        </init-param>
-        <init-param>
-            <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
-            <param-value>true</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>Jersey REST Service</servlet-name>
-        <url-pattern>/*</url-pattern>
-    </servlet-mapping>
 </web-app>
 ```
 
