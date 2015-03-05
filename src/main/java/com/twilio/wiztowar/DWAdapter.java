@@ -1,8 +1,36 @@
 package com.twilio.wiztowar;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.EventListener;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.FilterRegistration;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.ServletRegistration;
+import javax.servlet.ServletRegistration.Dynamic;
+import javax.servlet.http.HttpServlet;
+import javax.ws.rs.core.Application;
+
+import org.eclipse.jetty.servlet.FilterHolder;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.ImmutableMap;
 import com.yammer.dropwizard.Service;
-import com.yammer.dropwizard.config.*;
+import com.yammer.dropwizard.config.Bootstrap;
+import com.yammer.dropwizard.config.Configuration;
+import com.yammer.dropwizard.config.ConfigurationException;
+import com.yammer.dropwizard.config.ConfigurationFactory;
+import com.yammer.dropwizard.config.ExtendedEnvironment;
+import com.yammer.dropwizard.config.HttpConfiguration;
+import com.yammer.dropwizard.config.LoggingFactory;
 import com.yammer.dropwizard.jersey.JacksonMessageBodyProvider;
 import com.yammer.dropwizard.json.ObjectMapperFactory;
 import com.yammer.dropwizard.servlets.ThreadNameFilter;
@@ -13,28 +41,16 @@ import com.yammer.metrics.HealthChecks;
 import com.yammer.metrics.core.HealthCheck;
 import com.yammer.metrics.reporting.AdminServlet;
 import com.yammer.metrics.util.DeadlockHealthCheck;
-import org.eclipse.jetty.servlet.FilterHolder;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.servlet.Servlet;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration;
-import javax.servlet.http.HttpServlet;
-import javax.ws.rs.core.Application;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.EventListener;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * The {@link DWAdapter} adapts a Dropwizard {@link Service} to be hooked in to the lifecycle of a WAR.
  */
-public abstract class DWAdapter<T extends Configuration> extends Application {
+public abstract class DWAdapter<T extends Configuration> extends Application implements ServletContextListener {
+
+    /**
+     * The {@link ServletContext} that Dropwizard will run in.
+     */
+    private static ServletContext servletContext;
 
     /**
      * The {@link Logger} to use.
@@ -121,13 +137,9 @@ public abstract class DWAdapter<T extends Configuration> extends Application {
 
                 dwService.run(configuration, environment);
                 addHealthChecks(environment);
-                final ServletContext servletContext = ServletContextCallback.getServletContext();
                 if (servletContext == null) {
                     throw new IllegalStateException("ServletContext is null");
                 }
-
-                //Set the static DWAdapter so that we can shutdown
-                ServletContextCallback.setDWAdapter(this);
 
                 createInternalServlet(environment, servletContext);
                 createExternalServlet(environment, configuration.getHttpConfiguration(), servletContext);
@@ -139,6 +151,10 @@ public abstract class DWAdapter<T extends Configuration> extends Application {
                 singletons.addAll(environment.getJerseyResourceConfig().getSingletons());
                 classes = new HashSet<Class<?>>();
                 classes.addAll(environment.getJerseyResourceConfig().getClasses());
+                
+                Dynamic registration = servletContext.addServlet("Jersey REST Service", environment.getJerseyServletContainer());
+                registration.addMapping("/rest/*");
+                registration.setLoadOnStartup(1);
 
             } catch (Exception e) {
                 logger.error("Error {} ", e);
@@ -226,7 +242,11 @@ public abstract class DWAdapter<T extends Configuration> extends Application {
                 env.getValidator()));
 
         for (ImmutableMap.Entry<String, FilterHolder> entry : env.getFilters().entries()) {
-            context.addFilter(entry.getKey(), entry.getValue().getFilter());
+            String mapping = entry.getKey();
+            FilterHolder holder = entry.getValue();
+            FilterRegistration.Dynamic filterReg = context.addFilter(holder.getName(), holder.getClassName());
+            filterReg.addMappingForUrlPatterns(null, false, mapping);
+            filterReg.setInitParameters(holder.getInitParameters());
         }
 
         for (EventListener listener : env.getServletListeners()) {
@@ -291,6 +311,17 @@ public abstract class DWAdapter<T extends Configuration> extends Application {
         } catch (Exception e) {
           logger.error("Failed to stop environment cleanly due to {}", e);
         }
+    }
+
+    @Override
+    public void contextInitialized(ServletContextEvent sce) {
+        servletContext = sce.getServletContext();
+        initialize();
+    }
+
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+        shutDown();
     }
 }
 
