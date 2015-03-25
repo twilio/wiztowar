@@ -129,6 +129,12 @@ public abstract class DWAdapter<T extends Configuration> extends Application imp
 
             final Validator validator = new Validator();
             environment = new ExtendedEnvironment(bootstrap.getName(), configuration, bootstrap.getObjectMapperFactory(), validator);
+            final Map<String, Object> properties = this.getProperties(servletContext);
+            if (properties != null) {
+                for (final Map.Entry<String, Object> prop : properties.entrySet()) {
+                    environment.setJerseyProperty(prop.getKey(), prop.getValue());
+                }
+            }
             try {
 
                 environment.start();
@@ -304,6 +310,16 @@ public abstract class DWAdapter<T extends Configuration> extends Application imp
      * @return the {@link File} to read the configuration from.
      */
     public abstract File getConfigurationFile();
+
+    /**
+     * Override to return properties that will be accessible as Jersey properties in your service.
+     * This is useful for accessing servlet context attributes, for example.
+     *
+     * @return a map of properties
+     */
+    public Map<String, Object> getProperties(final ServletContext servletContext) {
+        return null;
+    }
 
     public void shutDown() {
         try {
